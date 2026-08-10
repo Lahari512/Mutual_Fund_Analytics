@@ -1,62 +1,57 @@
 import pandas as pd
-from pathlib import Path
 
-# Input and output folders
-RAW_FOLDER = Path("data/raw/raw")
-PROCESSED_FOLDER = Path("data/processed")
+# -----------------------------
+# Load NAV History
+# -----------------------------
+nav = pd.read_csv("data/raw/raw/02_nav_history.csv")
 
-# Create processed folder if it doesn't exist
-PROCESSED_FOLDER.mkdir(exist_ok=True)
+print("=" * 50)
+print("NAV HISTORY CLEANING")
+print("=" * 50)
 
-# Read all CSV files
-csv_files = sorted(RAW_FOLDER.glob("*.csv"))
+# -----------------------------
+# Convert date to datetime
+# -----------------------------
+nav["date"] = pd.to_datetime(nav["date"], errors="coerce")
 
-print("=" * 60)
-print("DATA CLEANING STARTED")
-print("=" * 60)
+# -----------------------------
+# Sort by AMFI code and date
+# -----------------------------
+nav = nav.sort_values(by=["amfi_code", "date"])
 
-for file in csv_files:
+# -----------------------------
+# Remove duplicate rows
+# -----------------------------
+duplicate_count = nav.duplicated().sum()
+nav = nav.drop_duplicates()
 
-    print(f"\nProcessing: {file.name}")
+# -----------------------------
+# Forward-fill missing NAV
+# -----------------------------
+nav["nav"] = nav.groupby("amfi_code")["nav"].ffill()
 
-    df = pd.read_csv(file)
+# -----------------------------
+# Validation
+# -----------------------------
+missing_dates = nav["date"].isna().sum()
+missing_nav = nav["nav"].isna().sum()
+invalid_nav = (nav["nav"] <= 0).sum()
 
-    # -----------------------------
-    # Remove duplicate rows
-    # -----------------------------
-    duplicate_rows = df.duplicated().sum()
-    print(f"Duplicate Rows: {duplicate_rows}")
+# -----------------------------
+# Print Summary
+# -----------------------------
+print(f"Duplicate Rows Removed : {duplicate_count}")
+print(f"Missing Dates          : {missing_dates}")
+print(f"Missing NAV Values     : {missing_nav}")
+print(f"Invalid NAV Values     : {invalid_nav}")
 
-    df = df.drop_duplicates()
+# -----------------------------
+# Save cleaned file
+# -----------------------------
+nav.to_csv(
+    "data/processed/nav_history_clean.csv",
+    index=False
+)
 
-    # -----------------------------
-    # Convert Date Columns
-    # -----------------------------
-    date_columns = [
-        "date",
-        "launch_date",
-        "transaction_date",
-        "portfolio_date",
-        "month"
-    ]
-
-    for column in date_columns:
-        if column in df.columns:
-            df[column] = pd.to_datetime(df[column])
-
-    # -----------------------------
-    # Missing Values
-    # -----------------------------
-    print("\nMissing Values:")
-    print(df.isnull().sum())
-
-    # -----------------------------
-    # Save cleaned file
-    # -----------------------------
-    output_file = PROCESSED_FOLDER / file.name
-
-    df.to_csv(output_file, index=False)
-
-    print(f"Saved: {output_file}")
-
-print("\nCleaning Completed Successfully!")
+print("\nCleaned file saved successfully.")
+print("Location: data/processed/nav_history_clean.csv")
