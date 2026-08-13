@@ -1,10 +1,10 @@
 import pandas as pd
 import plotly.express as px
 
-#load NAV history
+# Load NAV history
 nav = pd.read_csv("data/raw/raw/02_nav_history.csv")
 
-#load fund master
+# Load fund master
 fund = pd.read_csv("data/raw/raw/01_fund_master.csv")
 
 # Convert date column
@@ -17,13 +17,27 @@ df = nav.merge(
     how="left"
 )
 
+# Filter required period
+df = df[
+    (df["date"] >= "2022-01-01") &
+    (df["date"] <= "2026-12-31")
+]
+
+# Check number of schemes
+scheme_count = df["amfi_code"].nunique()
+
+print(f"Number of unique schemes: {scheme_count}")
+
+if scheme_count != 40:
+    print("WARNING: Expected 40 schemes.")
+
 # Create interactive line chart
 fig = px.line(
     df,
     x="date",
     y="nav",
     color="scheme_name",
-    title="Daily NAV Trend of All Mutual Fund Schemes (2022–2026)",
+    title="Daily NAV Trend of All 40 Mutual Fund Schemes (2022–2026)",
     labels={
         "date": "Date",
         "nav": "NAV",
@@ -64,8 +78,11 @@ fig.update_layout(
 # Save interactive HTML
 fig.write_html("dashboard/nav_trend_analysis.html")
 
-# Display chart
+# Save PNG
+fig.write_image("dashboard/nav_trend_analysis.png")
+
 fig.show()
 
 print("NAV Trend Analysis completed successfully.")
-print("Interactive dashboard saved to dashboard/nav_trend_analysis.html")
+print("HTML: dashboard/nav_trend_analysis.html")
+print("PNG: dashboard/nav_trend_analysis.png")

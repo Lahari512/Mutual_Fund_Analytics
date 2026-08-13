@@ -21,6 +21,7 @@ fig = px.pie(
 )
 
 fig.write_html("dashboard/sector_allocation.html")
+fig.write_image("dashboard/sector_allocation.png")
 
 fig.show()
 

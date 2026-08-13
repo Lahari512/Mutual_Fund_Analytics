@@ -35,6 +35,8 @@ fig.update_traces(textposition="outside")
 
 fig.write_html("dashboard/aum_analysis.html")
 
+fig.write_image("dashboard/aum_analysis.png")
+
 fig.show()
 
 print("AUM dashboard created successfully.")

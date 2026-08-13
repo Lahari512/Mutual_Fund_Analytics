@@ -18,7 +18,7 @@ fig = px.line(
 
 # Highlight Dec 2025 high
 fig.add_annotation(
-    x=pd.Timestamp("2025-12-01"),
+    x="2025-12-01",
     y=31002,
     text="₹31,002 Cr (Dec 2025)",
     showarrow=True,
@@ -32,5 +32,6 @@ fig.update_layout(
 )
 
 fig.write_html("dashboard/sip_time_series.html")
+fig.write_image("dashboard/sip_time_series.png")
 
 fig.show()

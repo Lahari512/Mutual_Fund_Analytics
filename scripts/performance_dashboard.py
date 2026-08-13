@@ -28,6 +28,7 @@ fig.update_layout(
 )
 
 fig.write_html("dashboard/performance_dashboard.html")
+fig.write_image("dashboard/performance_dashboard.png") 
 
 fig.show()
 

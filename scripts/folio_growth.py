@@ -18,7 +18,7 @@ fig = px.line(
 
 # Add milestone annotations
 fig.add_annotation(
-    x=pd.Timestamp("2022-01-01"),
+    x="2022-01-01",
     y=13.26,
     text="13.26 Cr (Jan 2022)",
     showarrow=True,
@@ -26,7 +26,7 @@ fig.add_annotation(
 )
 
 fig.add_annotation(
-    x=pd.Timestamp("2025-12-01"),
+    x="2025-12-01",
     y=26.12,
     text="26.12 Cr (Dec 2025)",
     showarrow=True,
@@ -41,6 +41,7 @@ fig.update_layout(
 
 # Save dashboard
 fig.write_html("dashboard/folio_growth.html")
+fig.write_image("dashboard/folio_growth.png")
 
 fig.show()
 
